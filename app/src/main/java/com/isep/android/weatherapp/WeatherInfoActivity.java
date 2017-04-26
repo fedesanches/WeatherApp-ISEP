@@ -10,13 +10,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.ArrayList;
 
 import static com.isep.android.weatherapp.R.layout.activity_weather_info;
 
 public class WeatherInfoActivity extends AppCompatActivity {
     static ProgressDialog pd_ring;
-    private WeatherConditions conditions = null;
+    private WeatherConditions conditions = new WeatherConditions();
+    private String urlapi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,38 +39,37 @@ public class WeatherInfoActivity extends AppCompatActivity {
         Intent i = getIntent();
         final Bundle extras = getIntent().getExtras();
         LatLng coordinate = i.getParcelableExtra("mapCoordinate");
-        String lat = String.valueOf(coordinate.latitude);
-        String lng = String.valueOf(coordinate.longitude);
+        String lat = String.valueOf(coordinate.latitude).substring(0,6);
+        String lng = String.valueOf(coordinate.longitude).substring(0,6);
 
+        conditions.setLat(lat);
+        conditions.setLng(lng);
 
-        GetWWDataTask task = new GetWWDataTask();
-        task.execute("http://api.worldweatheronline.com/free/v1/weather.ashx?q="+lat+","+lng+"&format=xml&date=today&num_of_days=1&key=9dahjexnkyedxgzrgk4nxrhb");
+        urlapi = "http://api.worldweatheronline.com/free/v1/weather.ashx?q="+lat+","+lng+"&format=json&date=today&num_of_days=1&key=9dahjexnkyedxgzrgk4nxrhb";
+        new GetWWDataTask().execute(urlapi);
 
         TextView latView = (TextView) findViewById(R.id.lat_text_view);
         latView.setText("Latitude: "+lat);
 
         TextView lngView = (TextView) findViewById(R.id.lng_text_view);
         lngView.setText("Longitude: "+lng);
-
-        /*DBAdapter adapter = new DBAdapter(getApplicationContext());
-        adapter.insertWeatherCondition(lat, lng, null, null, null);
-        Log.i("holaaaa",adapter.getAllWeatherConditions().toString());*/
     }
 
 
     private void UpdateDisplay() {
         TextView temperatureView = (TextView) findViewById(R.id.temperature_text_view);
-        TextView humidityView = (TextView) findViewById(R.id.humidity_text_view);
-        TextView windView = (TextView) findViewById(R.id.wind_text_view);
+        temperatureView.setText(conditions.getTemperature()+" °C");
 
-        temperatureView.setText(conditions.getTemperature());
-        humidityView.setText(conditions.getHumidity());
-        windView.setText(conditions.getWind());
+        TextView humidityView = (TextView) findViewById(R.id.humidity_text_view);
+        humidityView.setText(conditions.getHumidity()+" %");
+
+        TextView windView = (TextView) findViewById(R.id.wind_text_view);
+        windView.setText(conditions.getWind()+" Km/h");
     }
 
-    private class GetWWDataTask extends AsyncTask<String, Void, WeatherConditions > {
+   private class GetWWDataTask extends AsyncTask<String, String, String> {
 
-        @Override
+       @Override
         protected void onPreExecute() {
             pd_ring = new ProgressDialog(WeatherInfoActivity.this);
             pd_ring.setMessage("Loading....");
@@ -69,21 +81,57 @@ public class WeatherInfoActivity extends AppCompatActivity {
         }
 
         @Override
-        protected WeatherConditions doInBackground(String... params) {
+        protected String doInBackground(String... params) {
+            HttpURLConnection connection = null;
+
             try {
-                WeatherConditionsHandler handler = new WeatherConditionsHandler();
                 URL url = new URL(params[0]);
-                return handler.getWeatherConditions(url);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                InputStream stream = connection.getInputStream();
+
+                BufferedReader reader= new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+
+                while ((line = reader.readLine()) != null){
+                    buffer.append(line+"\n");
+                    Log.e("Response:",line);
+                }
+                return getWeatherConditions(buffer.toString());
             } catch (Exception e) {
-                return null;
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
             }
+            return null;
         }
 
         @Override
-        protected void onPostExecute(WeatherConditions c) {
-            conditions = c;
+        protected void onPostExecute(String result) {
             pd_ring.dismiss();
             UpdateDisplay();
         }
+    }
+
+    public String getWeatherConditions (String resp) throws JSONException {
+
+        JSONObject mResponseObject = new JSONObject(resp);
+        JSONObject responObject	= mResponseObject.getJSONObject("data");
+        JSONArray array;
+
+        array = responObject.getJSONArray("current_condition");
+        for(int i = 0; i<array.length(); i++) {
+            conditions.setTemperature(array.getJSONObject(i).getString("temp_C"));
+            conditions.setWind(array.getJSONObject(i).getString("windspeedKmph"));
+            conditions.setHumidity(array.getJSONObject(i).getString("humidity"));
+        }
+
+        DBAdapter adapter = new DBAdapter(getApplicationContext());
+        adapter.insertWeatherCondition(conditions.getLat(), conditions.getLng(), conditions.getTemperature(), conditions.getWind(), conditions.getHumidity());
+        Log.i("holaaaa",adapter.getAllWeatherConditions().toString());
+        return null;
     }
 }
