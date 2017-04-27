@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:padding="8dp"
         android:text="COORDINATES"
         android:background="#f3217c"
         android:textAppearance="?android:textAppearanceLarge"
@@ -58,15 +58,80 @@
         android:textStyle="bold"
         android:layout_weight="1"/>
 
-    <TextView
-        android:id="@+id/temperature_text_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="va la temperatura"
-        android:textAppearance="?android:textAppearanceLarge"
-        android:textSize="16sp"
-        android:layout_weight="1"/>
+        android:background="#f3217c">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:text="ACTUAL"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="13sp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            android:textAlignment="center"
+            android:text="MAX"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="13sp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            android:textAlignment="center"
+            android:text="MIN"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="13sp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/temperature_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textAlignment="center"
+            android:text="va la temperatura"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="16sp"
+            android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/temperatureMax_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textAlignment="center"
+            android:text="va la temperatura"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="16sp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/temperatureMin_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textAlignment="center"
+            android:text="va la temperatura"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textSize="16sp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
@@ -90,6 +155,9 @@
         android:textSize="16sp"
         android:layout_weight="1"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -102,6 +170,23 @@
         android:textStyle="bold"
         android:layout_weight="1"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:text="RAIN"
+            android:background="#f3217c"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <TextView
         android:id="@+id/humidity_text_view"
         android:layout_width="match_parent"
@@ -111,5 +196,16 @@
         android:textAppearance="?android:textAppearanceLarge"
         android:textSize="16sp"
         android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/rain_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="va la humedad"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textSize="16sp"
+        android:layout_weight="1"/>
+    </LinearLayout>
 
 </LinearLayout>

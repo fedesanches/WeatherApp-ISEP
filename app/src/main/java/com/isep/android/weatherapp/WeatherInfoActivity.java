@@ -1,28 +1,26 @@
 package com.isep.android.weatherapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.util.ArrayList;
 
 import static com.isep.android.weatherapp.R.layout.activity_weather_info;
 
@@ -30,6 +28,8 @@ public class WeatherInfoActivity extends AppCompatActivity {
     static ProgressDialog pd_ring;
     private WeatherConditions conditions = new WeatherConditions();
     private String urlapi;
+
+    String rain, max, min;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,15 @@ public class WeatherInfoActivity extends AppCompatActivity {
 
         TextView windView = (TextView) findViewById(R.id.wind_text_view);
         windView.setText(conditions.getWind()+" Km/h");
+
+        TextView maxView = (TextView) findViewById(R.id.temperatureMax_text_view);
+        maxView.setText(max+" °C");
+
+        TextView minView = (TextView) findViewById(R.id.temperatureMin_text_view);
+        minView.setText(min+" °C");
+
+        TextView rainView = (TextView) findViewById(R.id.rain_text_view);
+        rainView.setText(rain+" MM");
     }
 
    private class GetWWDataTask extends AsyncTask<String, String, String> {
@@ -96,7 +105,7 @@ public class WeatherInfoActivity extends AppCompatActivity {
 
                 while ((line = reader.readLine()) != null){
                     buffer.append(line+"\n");
-                    Log.e("Response:",line);
+                    Log.d("Response:",line);
                 }
                 return getWeatherConditions(buffer.toString());
             } catch (Exception e) {
@@ -126,12 +135,20 @@ public class WeatherInfoActivity extends AppCompatActivity {
         for(int i = 0; i<array.length(); i++) {
             conditions.setTemperature(array.getJSONObject(i).getString("temp_C"));
             conditions.setWind(array.getJSONObject(i).getString("windspeedKmph"));
+            conditions.setWind(conditions.getWind()+" "+array.getJSONObject(i).getString("winddir16Point"));
             conditions.setHumidity(array.getJSONObject(i).getString("humidity"));
+            rain = array.getJSONObject(i).getString("precipMM");
+        }
+
+        array = responObject.getJSONArray("weather");
+        for (int i = 0; i<array.length(); i++) {
+            max = array.getJSONObject(i).getString("tempMaxC");
+            min = array.getJSONObject(i).getString("tempMinC");
         }
 
         DBAdapter adapter = new DBAdapter(getApplicationContext());
         adapter.insertWeatherCondition(conditions.getLat(), conditions.getLng(), conditions.getTemperature(), conditions.getWind(), conditions.getHumidity());
-        Log.i("holaaaa",adapter.getAllWeatherConditions().toString());
+        Log.d("insertDB",adapter.getAllWeatherConditions().toString());
         return null;
     }
 }

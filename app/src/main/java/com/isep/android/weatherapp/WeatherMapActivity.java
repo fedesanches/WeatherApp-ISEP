@@ -3,6 +3,8 @@ package com.isep.android.weatherapp;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -33,7 +35,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapClick(LatLng coordinate) {
         removeMarker();
-        marker = mMap.addMarker(new MarkerOptions().position(coordinate).title("The coordinates of the point are:"));
+        marker = mMap.addMarker(new MarkerOptions().position(coordinate));
 
         Bundle args = new Bundle();
         args.putParcelable("mapCoordinate", coordinate);
