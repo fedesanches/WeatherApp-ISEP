@@ -67,13 +67,13 @@ public class WeatherInfoActivity extends AppCompatActivity {
         windView.setText(conditions.getWind()+" Km/h");
 
         TextView maxView = (TextView) findViewById(R.id.temperatureMax_text_view);
-        maxView.setText(max+" °C");
+        maxView.setText(conditions.getMax()+" °C");
 
         TextView minView = (TextView) findViewById(R.id.temperatureMin_text_view);
-        minView.setText(min+" °C");
+        minView.setText(conditions.getMin()+" °C");
 
         TextView rainView = (TextView) findViewById(R.id.rain_text_view);
-        rainView.setText(rain+" MM");
+        rainView.setText(conditions.getRain()+" MM");
     }
 
    private class GetWWDataTask extends AsyncTask<String, String, String> {
@@ -137,17 +137,17 @@ public class WeatherInfoActivity extends AppCompatActivity {
             conditions.setWind(array.getJSONObject(i).getString("windspeedKmph"));
             conditions.setWind(conditions.getWind()+" "+array.getJSONObject(i).getString("winddir16Point"));
             conditions.setHumidity(array.getJSONObject(i).getString("humidity"));
-            rain = array.getJSONObject(i).getString("precipMM");
+            conditions.setRain(array.getJSONObject(i).getString("precipMM"));
         }
 
         array = responObject.getJSONArray("weather");
         for (int i = 0; i<array.length(); i++) {
-            max = array.getJSONObject(i).getString("tempMaxC");
-            min = array.getJSONObject(i).getString("tempMinC");
+            conditions.setMax(array.getJSONObject(i).getString("tempMaxC"));
+            conditions.setMin(array.getJSONObject(i).getString("tempMinC"));
         }
 
         DBAdapter adapter = new DBAdapter(getApplicationContext());
-        adapter.insertWeatherCondition(conditions.getLat(), conditions.getLng(), conditions.getTemperature(), conditions.getWind(), conditions.getHumidity());
+        adapter.insertWeatherCondition(conditions.getLat(), conditions.getLng(), conditions.getTemperature(), conditions.getMax(), conditions.getMin(), conditions.getWind(), conditions.getHumidity(), conditions.getRain());
         Log.d("insertDB",adapter.getAllWeatherConditions().toString());
         return null;
     }
